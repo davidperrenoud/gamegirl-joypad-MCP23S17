@@ -15,7 +15,7 @@
     exit(EXIT_FAILURE); \
   } while(0)
 
-#define BASE    100 \\offset for GPIO expander numbering
+#define BASE    100 // offset for GPIO expander numbering
 
 using namespace std;
 
@@ -264,12 +264,12 @@ int main() {
 
     if (LBO == 0) {
       system("Critically low battery shutting down now!\n");
-      system("echo -n "SHUTDOWN" | nc -u -w1 127.0.0.1 55355");
+      system("echo -n \"SHUTDOWN\" | nc -u -w1 127.0.0.1 55355");
     }
 
     if (powerswitch == 0) {
       system("Power button toggled, shutting down now!\n");
-      system("echo -n "SHUTDOWN" | nc -u -w1 127.0.0.1 55355");
+      system("echo -n \"SHUTDOWN\" | nc -u -w1 127.0.0.1 55355");
     }
 
     memset(&ev, 0, sizeof(struct input_event));
