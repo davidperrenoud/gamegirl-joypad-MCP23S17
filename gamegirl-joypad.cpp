@@ -38,18 +38,18 @@ int _SHDN = 25; // GPIO25 - Power switch
  *  MISO | 14      - SO         A0 -       15 |  GND    
  */
 
-int _left = 103;
-int _up = 104;
-int _right = 105;
-int _down = 106;
-int _l1 = 107;
-int _b = 109;
-int _a = 110;
-int _x = 111;
-int _y = 112;
-int _start = 113;
-int _selec = 114;
-int _r1 = 115;
+int btn_left = 103;
+int btn_up = 104;
+int btn_right = 105;
+int btn_down = 106;
+int btn_l1 = 107;
+int btn_b = 109;
+int btn_a = 110;
+int btn_x = 111;
+int btn_y = 112;
+int btn_start = 113;
+int btn_selec = 114;
+int btn_r1 = 115;
 
 int _LBO = 100; //Critical Low Battery alert, set as input pulled high
 int _SS1 = 101; //SPI Chip Select pin for LCD, pull high
@@ -189,18 +189,18 @@ int main() {
     l1_button_old     = l1_button;
     r1_button_old     = r1_button;
 
-    up_button    = digitalRead(_up); // 
-    down_button  = digitalRead(_down); // 
-    left_button  = digitalRead(_left); // 
-    right_button = digitalRead(_right); // 
-    x_button     = digitalRead(_x); //
-    b_button     = digitalRead(_b); // 
-    y_button     = digitalRead(_y); // 
-    a_button     = digitalRead(_a); //
-    start_button = digitalRead(_start); //
-    selec_button = digitalRead(_selec); // 
-    l1_button    = digitalRead(_l1); // 
-    r1_button    = digitalRead(_r1); // 
+    up_button    = digitalRead(btn_up); // 
+    down_button  = digitalRead(btn_down); // 
+    left_button  = digitalRead(btn_left); // 
+    right_button = digitalRead(btn_right); // 
+    x_button     = digitalRead(btn_x); //
+    b_button     = digitalRead(btn_b); // 
+    y_button     = digitalRead(btn_y); // 
+    a_button     = digitalRead(btn_a); //
+    start_button = digitalRead(btn_start); //
+    selec_button = digitalRead(btn_selec); // 
+    l1_button    = digitalRead(btn_l1); // 
+    r1_button    = digitalRead(btn_r1); // 
     powerswitch  = digitalRead(_SHDN); //
     LBO          = digitalRead(_LBO); //
 
