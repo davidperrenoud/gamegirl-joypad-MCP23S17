@@ -75,6 +75,8 @@ void set_button_event(int fd, int button, int value) {
 }
 
 int main() {
+  unsigned i;
+
   // Initialize GPIO
   wiringPiSetupGpio();
   
