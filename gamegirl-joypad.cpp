@@ -22,20 +22,20 @@ using namespace std;
 int _SHDN = 25; // GPIO25 - Power switch
 
 /* MCP23S17 PINOUT   Pin 1(GPB0) start at GPIO 100 GPB0 = 100 | GPA0 = 108
- *   LBO | 1 (100) - GPB0     GPA7 - 28 (115) |  R1
- *   SS1 | 2 (101) - GPB1     GPA6 - 27 (114) |  Select
- *  WiFi | 3 (102) - GPB2     GPA5 - 26 (113) |  Start
- *  Left | 4 (103) - GPB3     GPA4 - 25 (112) |  Y (West)
- *    Up | 5 (104) - GPB4     GPA3 - 24 (111) |  X (North)
- * Right | 6 (105) - GPB5     GPA2 - 23 (110) |  A (East)
- *  Down | 7 (106) - GPB6     GPA1 - 22 (109) |  B (South)
- *    L1 | 8 (107) - GPB7     GPA0 - 21 (108) |  AMP 
- *   3V3 | 9  - VDD      INTA - 20 |  NC
- *   GND | 10 - VSS      INTB - 19 |  NC
- *   GND | 11 - CS       RST  - 18 |  3V3
- *   SCK | 12 - SCK      A2   - 17 |  GND
- *  MOSI | 13 - SI       A1   - 16 |  GND
- *  MISO | 14 - SO       A0   - 15 |  GND    
+ *   LBO | 1 (100) - GPB0     GPA7 - (115) 28 |  R1
+ *   SS1 | 2 (101) - GPB1     GPA6 - (114) 27 |  Select
+ *  WiFi | 3 (102) - GPB2     GPA5 - (113) 26 |  Start
+ *  Left | 4 (103) - GPB3     GPA4 - (112) 25 |  Y (West)
+ *    Up | 5 (104) - GPB4     GPA3 - (111) 24 |  X (North)
+ * Right | 6 (105) - GPB5     GPA2 - (110) 23 |  A (East)
+ *  Down | 7 (106) - GPB6     GPA1 - (109) 22 |  B (South)
+ *    L1 | 8 (107) - GPB7     GPA0 - (108) 21 |  AMP 
+ *   3V3 | 9       - VDD      INTA -       20 |  NC
+ *   GND | 10      - VSS      INTB -       19 |  NC
+ *   GND | 11      - CS        RST -       18 |  3V3
+ *   SCK | 12      - SCK        A2 -       17 |  GND
+ *  MOSI | 13      - SI         A1 -       16 |  GND
+ *  MISO | 14      - SO         A0 -       15 |  GND    
  */
 
 int _left = 103;
