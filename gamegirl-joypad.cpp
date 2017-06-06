@@ -21,15 +21,15 @@ using namespace std;
 
 int _SHDN = 25; // GPIO25 - Power switch
 
-/* MCP23S17 PINOUT   Pin 1(GPB0) start at GPIO 100
- *   LBO | 1  - GPB0     GPA7 - 28 |  R1
- *   SS1 | 2  - GPB1     GPA6 - 27 |  Select
- *  WiFi | 3  - GPB2     GPA5 - 26 |  Start
- *  Left | 4  - GPB3     GPA4 - 25 |  Y (West)
- *    Up | 5  - GPB4     GPA3 - 24 |  X (North)
- * Right | 6  - GPB5     GPA2 - 23 |  A (East)
- *  Down | 7  - GPB6     GPA1 - 22 |  B (South)
- *    L1 | 8  - GPB7     GPA0 - 21 |  AMP 
+/* MCP23S17 PINOUT   Pin 1(GPB0) start at GPIO 100 GPB0 = 100 | GPA0 = 108
+ *   LBO | 1 (100) - GPB0     GPA7 - 28 (115) |  R1
+ *   SS1 | 2 (101) - GPB1     GPA6 - 27 (114) |  Select
+ *  WiFi | 3 (102) - GPB2     GPA5 - 26 (113) |  Start
+ *  Left | 4 (103) - GPB3     GPA4 - 25 (112) |  Y (West)
+ *    Up | 5 (104) - GPB4     GPA3 - 24 (111) |  X (North)
+ * Right | 6 (105) - GPB5     GPA2 - 23 (110) |  A (East)
+ *  Down | 7 (106) - GPB6     GPA1 - 22 (109) |  B (South)
+ *    L1 | 8 (107) - GPB7     GPA0 - 21 (108) |  AMP 
  *   3V3 | 9  - VDD      INTA - 20 |  NC
  *   GND | 10 - VSS      INTB - 19 |  NC
  *   GND | 11 - CS       RST  - 18 |  3V3
@@ -38,24 +38,25 @@ int _SHDN = 25; // GPIO25 - Power switch
  *  MISO | 14 - SO       A0   - 15 |  GND    
  */
 
-int _up = 104;
-int _down = 106;
 int _left = 103;
+int _up = 104;
 int _right = 105;
-int _b = 121;
-int _a = 122;
-int _x = 123;
-int _y = 124;
+int _down = 106;
 int _l1 = 107;
-int _r1 = 127;
-int _start = 125;
-int _selec = 126;
+int _b = 109;
+int _a = 110;
+int _x = 111;
+int _y = 112;
+int _start = 113;
+int _selec = 114;
+int _r1 = 115;
 
-int _WiFi_EN = 102; //Pull high to enable
-int _AMP_EN = 120; //Pull high to enable
-int _SS1 = 101; //SPI Chip Select pin for LCD, pull high
 int _LBO = 100; //Critical Low Battery alert, set as input pulled high
-
+int _SS1 = 101; //SPI Chip Select pin for LCD, pull high
+int _WiFi_EN = 102; //Pull high to enable
+int _AMP_EN = 108; //Pull high to enable
+bool WiFi_status = 1; //Sets to on by default
+bool AMP_status = 1; //Sets to on by default
 
 void set_key_bit(int fd, int button) {
   if (ioctl(fd, UI_SET_KEYBIT, button) < 0) {
@@ -76,17 +77,16 @@ void set_button_event(int fd, int button, int value) {
 int main() {
   // Initialize GPIO
   wiringPiSetupGpio();
-
-
+  
   // Initialize MCP23S17
   mcp23s17Setup (BASE, 0, 0) ;
-
+  
   //Set all button input pins on MCP23S17 to Input with PullUps enabled
-  for (i = 2 ; i < 7 ; ++i){
+  for (i = 2 ; i < 7 ; ++i){ //102 - 107
     pinMode (BASE+i, INPUT);
     pullUpDnControl(BASE+i,PUD_UP);
   }
-  for (i = 9 ; i < 15 ; ++i){
+  for (i = 9 ; i < 15 ; ++i){ //109-115
     pinMode (BASE+i, INPUT);
     pullUpDnControl(BASE+i,PUD_UP);
   }
@@ -102,6 +102,10 @@ int main() {
   //Enables WiFi by default
   pinMode (_WiFi_EN,OUTPUT);
   digitalWrite(_WiFi_EN,1);
+    
+  //Sets up Audio, already on by default
+  pinMode (_AMP_EN,OUTPUT);
+  digitalWrite(_AMP_EN,1);
   
   // Initialise udev
   struct uinput_user_dev uidev;
@@ -152,20 +156,21 @@ int main() {
   if (ioctl(fd, UI_DEV_CREATE) < 0)
     die("error: ioctl");
 
-  int up_button, up_button_old         = 0;
-  int down_button, down_button_old     = 0;
-  int left_button, left_button_old     = 0;
-  int right_button, right_button_old   = 0;
-  int x_button, x_button_old           = 0;
-  int b_button, b_button_old           = 0;
-  int y_button, y_button_old           = 0;
-  int a_button, a_button_old           = 0;
-  int start_button, start_button_old   = 0;
-  int selec_button, selec_button_old   = 0;
-  int l1_button, l1_button_old         = 0;
-  int r1_button, r1_button_old         = 0;
-  int powerswitch                      = 0;
-  int LBO                              = 0;
+  int up_button, up_button_old         = 1;
+  int down_button, down_button_old     = 1;
+  int left_button, left_button_old     = 1;
+  int right_button, right_button_old   = 1;
+  int x_button, x_button_old           = 1;
+  int b_button, b_button_old           = 1;
+  int y_button, y_button_old           = 1;
+  int a_button, a_button_old           = 1;
+  int start_button, start_button_old   = 1;
+  int selec_button, selec_button_old   = 1;
+  int l1_button, l1_button_old         = 1;
+  int r1_button, r1_button_old         = 1;
+  int powerswitch                      = 1;
+  int LBO                              = 1;
+  int toggle_timeout                   = 0; //Toggle timeout for toggling WiFi or Amp
 
   while (1) {
     // Read GPIO
@@ -234,8 +239,19 @@ int main() {
       set_button_event(fd, BTN_START, start_button != 0);
     }
 
-    if (selec_button != selec_button_old) {
-      set_button_event(fd, BTN_SELECT, selec_button != 0);
+    if (selec_button != selec_button_old) { //mode button | Sel+L1 WiFi toggle | Sel+R1 = Amp toggle | 
+      if (l1_button == 0 && toggle_timeout > 119){
+        WiFi_status != WiFi_status;
+        digitalWrite(_WiFi_EN,WiFi_status);
+        toggle_timeout = 0;
+      }
+      else if(r1_button == 0 && toggle_timeout > 119){
+        AMP_status != AMP_status;
+        digitalWrite(_AMP_EN,AMP_status);
+        toggle_timeout = 0;
+      }
+      else
+        set_button_event(fd, BTN_SELECT, selec_button != 0);
     }
 
     if (l1_button != l1_button_old) {
@@ -246,14 +262,14 @@ int main() {
       set_button_event(fd, BTN_TR, r1_button != 0);
     }
 
-    if (LBO = 1) {
-      system("Critically low battery shutting down now!");
-      system("sudo shutdown -h now");
+    if (LBO == 0) {
+      system("Critically low battery shutting down now!\n");
+      system("echo -n "SHUTDOWN" | nc -u -w1 127.0.0.1 55355");
     }
 
-    if (powerswitch = 1) {
-      system("Power button toggled, shutting down now!");
-      system("sudo shutdown -h now");
+    if (powerswitch == 0) {
+      system("Power button toggled, shutting down now!\n");
+      system("echo -n "SHUTDOWN" | nc -u -w1 127.0.0.1 55355");
     }
 
     memset(&ev, 0, sizeof(struct input_event));
@@ -264,6 +280,9 @@ int main() {
       die("error: write");
 
     delay(1000/120);
+    
+    if(toggle_timeout < 119)
+      toggle_timeout++;
   }
 
   // Destroy udev
