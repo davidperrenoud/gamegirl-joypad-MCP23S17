@@ -243,12 +243,12 @@ int main() {
 
     if (selec_button != selec_button_old) { //mode button | Sel+L1 WiFi toggle | Sel+R1 = Amp toggle | 
       if (l1_button == 0 && toggle_timeout > 119){
-        WiFi_status != WiFi_status;
+        WiFi_status = !WiFi_status;
         digitalWrite(_WiFi_EN,WiFi_status);
         toggle_timeout = 0;
       }
       else if(r1_button == 0 && toggle_timeout > 119){
-        AMP_status != AMP_status;
+        AMP_status = !AMP_status;
         digitalWrite(_AMP_EN,AMP_status);
         toggle_timeout = 0;
       }
