@@ -81,15 +81,15 @@ int main() {
   wiringPiSetupGpio();
   
   // Initialize MCP23S17
-  mcp23s17Setup (BASE, 0, 0) ;
+  mcp23s17Setup(BASE, 0, 0) ;
   
-  //Set all button input pins on MCP23S17 to Input with PullUps enabled
+  //Set button input pins on MCP23S17 to INPUT with PullUps enabled
   for (i = 2 ; i < 7 ; ++i){ //102 - 107
-    pinMode (BASE+i, INPUT);
+    pinMode(BASE+i, INPUT);
     pullUpDnControl(BASE+i,PUD_UP);
   }
   for (i = 9 ; i < 15 ; ++i){ //109-115
-    pinMode (BASE+i, INPUT);
+    pinMode(BASE+i, INPUT);
     pullUpDnControl(BASE+i,PUD_UP);
   }
 
@@ -98,15 +98,15 @@ int main() {
   pullUpDnControl(_SHDN,PUD_UP);
   
   //Sets Chip Select pin of LCD high disabling the SPI connection
-  pinMode (_SS1,OUTPUT);
-  digitalWrite(_SS1,1);
+  pinMode(_SS1,OUTPUT);
+  pullUpDnControl(_SS1,PUD_UP);
 
   //Enables WiFi by default
-  pinMode (_WiFi_EN,OUTPUT);
+  pinMode(_WiFi_EN,OUTPUT);
   digitalWrite(_WiFi_EN,1);
     
   //Sets up Audio, already on by default
-  pinMode (_AMP_EN,OUTPUT);
+  pinMode(_AMP_EN,OUTPUT);
   digitalWrite(_AMP_EN,1);
   
   // Initialise udev
@@ -173,6 +173,8 @@ int main() {
   int powerswitch                      = 1;
   int LBO                              = 1;
   int toggle_timeout                   = 0; //Toggle timeout for toggling WiFi or Amp
+  int shdn_delay                       = 0; //Delay (debounce) for shutdown switch
+  int LBO_delay                        = 0; //Delay  for LBO
 
   while (1) {
     // Read GPIO
@@ -241,18 +243,19 @@ int main() {
       set_button_event(fd, BTN_START, start_button != 0);
     }
 
-    if (selec_button != selec_button_old) { //mode button | Sel+L1 WiFi toggle | Sel+R1 = Amp toggle | 
-      if (l1_button == 0 && toggle_timeout > 119){
+    if (selec_button == 0 && toggle_timeout > 119){ //mode button | Sel+L1 WiFi toggle | Sel+R1 = Amp toggle | 
+      if (l1_button == 0 ){
         WiFi_status = !WiFi_status;
-        digitalWrite(_WiFi_EN,WiFi_status);
+        digitalWrite(_WiFi_EN, WiFi_status);
         toggle_timeout = 0;
       }
-      else if(r1_button == 0 && toggle_timeout > 119){
+      else if(r1_button == 0){
         AMP_status = !AMP_status;
         digitalWrite(_AMP_EN,AMP_status);
         toggle_timeout = 0;
       }
-      else
+    }
+    else if(selec_button != selec_button_old)
         set_button_event(fd, BTN_SELECT, selec_button != 0);
     }
 
@@ -265,14 +268,23 @@ int main() {
     }
 
     if (LBO == 0) {
-      system("Critically low battery shutting down now!\n");
-      system("echo -n \"SHUTDOWN\" | nc -u -w1 127.0.0.1 55355");
+      LBO_delay++;
+      if(LBO_delay > 59) {
+        system("echo Critically low battery shutting down now!\n");
+        system("echo -n \"SHUTDOWN\" | nc -u -w1 127.0.0.1 55355");
     }
+    else
+      LDO_delay = 0;
 
     if (powerswitch == 0) {
-      system("Power button toggled, shutting down now!\n");
-      system("echo -n \"SHUTDOWN\" | nc -u -w1 127.0.0.1 55355");
+      shdn_delay++;
+      if(shdn_delay > 59) {
+        system("echo Power button toggled, shutting down now!\n");
+        system("echo -n \"SHUTDOWN\" | nc -u -w1 127.0.0.1 55355");
+      }
     }
+    else
+        shdn_delay = 0;
 
     memset(&ev, 0, sizeof(struct input_event));
     ev.type = EV_SYN;
