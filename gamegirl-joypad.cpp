@@ -81,7 +81,7 @@ int main() {
   wiringPiSetupGpio();
   
   // Initialize MCP23S17
-  mcp23s17Setup(BASE, 0, 0) ;
+  mcp23s17Setup(BASE, 1, 0) ;
   
   //Set button input pins on MCP23S17 to INPUT with PullUps enabled
   for (i = 2 ; i < 7 ; ++i){ //102 - 107
